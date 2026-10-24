@@ -16,6 +16,10 @@ import java.util.UUID;
 
 @Service
 public class AdminImageStorageService {
+
+    @Value("${file.public-base-url}")
+    private String filePublicBaseUrl;
+
     @Value("${file.path}")
     private String uploadPath;
 
@@ -142,7 +146,8 @@ public class AdminImageStorageService {
         // 4. 이미지 조회 URL 생성
         String storageKey = folderName + "/" + storedFilename;
 
-        String url = "/api/v1/file/"
+        String url = filePublicBaseUrl
+                + "/api/v1/file/"
                 + imagePathType
                 + "/"
                 + storedFilename;

@@ -1,6 +1,10 @@
 package com.jhe.question_bank.controller.admin;
 
 import com.jhe.question_bank.common.dto.response.ResponseDto;
+import com.jhe.question_bank.common.dto.request.admin.GetAdminQuestionsRequestDto;
+import com.jhe.question_bank.common.dto.response.admin.GetAdminQuestionListResponseDto;
+import com.jhe.question_bank.service.admin.AdminQuestionQueryService;
+import jakarta.validation.Valid;
 import com.jhe.question_bank.service.admin.AdminQuestionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +19,15 @@ import java.util.List;
 public class AdminQuestionController {
 
     private final AdminQuestionService adminQuestionService;
+
+    private final AdminQuestionQueryService adminQuestionQueryService;
+
+    @GetMapping
+    public ResponseEntity<GetAdminQuestionListResponseDto> getQuestions(
+            @Valid @ModelAttribute GetAdminQuestionsRequestDto request
+    ) {
+        return adminQuestionQueryService.getQuestions(request);
+    }
 
     @PostMapping
     public ResponseEntity<ResponseDto> postQuestions(

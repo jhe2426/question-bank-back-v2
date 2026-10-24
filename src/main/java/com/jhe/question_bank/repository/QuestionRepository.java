@@ -1,6 +1,9 @@
 package com.jhe.question_bank.repository;
 
 import java.util.List;
+import com.jhe.question_bank.common.dto.response.admin.AdminQuestionListItemDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -70,4 +73,16 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, Intege
         @Param("sourceType") String sourceType,
         @Param("sessionId") Integer sessionId
     );
+
+    @Query(value = """
+            SELECT new com.jhe.question_bank.common.dto.response.admin.AdminQuestionListItemDto(
+                q.questionId, q.questionType, q.questionText, q.difficulty, q.imageUrl, q.sectionId)
+            FROM questions q
+            WHERE q.questionType = '모의고사' AND q.difficulty = :difficulty
+            ORDER BY q.questionId DESC
+            """, countQuery = """
+            SELECT COUNT(q) FROM questions q
+            WHERE q.questionType = '모의고사' AND q.difficulty = :difficulty
+            """)
+    Page<AdminQuestionListItemDto> findAdminMockQuestions(@Param("difficulty") String difficulty, Pageable pageable);
 }
