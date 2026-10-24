@@ -124,7 +124,8 @@ class AdminQuestionUpdateIntegrationTest {
         assertThat(question.getDifficulty()).isEqualTo("상");
         assertThat(question.getAnswer()).isEqualTo(4);
         assertThat(question.getImageUrl()).isEqualTo(oldQuestionUrl);
-        mvc.perform(get("/api/admin/questions/{id}", questionId).with(user("admin").roles("ADMIN")))
+        mvc.perform(get("/api/admin/questions/{id}", questionId).param("pastExamRound", "39")
+                        .with(user("admin").roles("ADMIN")))
                 .andExpect(jsonPath("$.option1").value("수정1")).andExpect(jsonPath("$.option2").value("수정2"))
                 .andExpect(jsonPath("$.option3").value("수정3")).andExpect(jsonPath("$.option4").value("수정4"))
                 .andExpect(jsonPath("$.shortExplanation").value("수정 간단"))
@@ -204,6 +205,24 @@ class AdminQuestionUpdateIntegrationTest {
         body.put("tags", List.of());
         mvc.perform(request(mock.getQuestionId(), body).with(user("admin").roles("ADMIN"))).andExpect(status().isOk());
         assertThat(tags.findPastExamRoundsByQuestionId(mock.getQuestionId())).isEmpty();
+    }
+
+    @Test
+    void allowsMissingDifficultyForPastExamButRequiresItForMockExam() throws Exception {
+        var pastBody = body(); pastBody.put("difficulty", null);
+        mvc.perform(request(questionId, pastBody).with(user("admin").roles("ADMIN")))
+                .andExpect(status().isOk());
+        em.flush(); em.clear();
+        assertThat(questions.findById(questionId).orElseThrow().getDifficulty()).isNull();
+
+        var mock = questions.save(new QuestionEntity(null, null, 111, "모의고사", "모의", null,
+                "1", "2", "3", "4", 1, null, "중", null));
+        var mockBody = body();
+        mockBody.remove("difficulty");
+        mockBody.remove("pastExamRound");
+        mockBody.remove("questionOrder");
+        mvc.perform(request(mock.getQuestionId(), mockBody).with(user("admin").roles("ADMIN")))
+                .andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value("VF"));
     }
 
     @Test
@@ -294,7 +313,7 @@ class AdminQuestionUpdateIntegrationTest {
     @Test
     void validatesRequiredFieldsDifficultySectionRoundOrderAndTags() throws Exception {
         List<Map<String,Object>> invalid = new ArrayList<>();
-        for (String field : List.of("questionText", "option1", "option2", "option3", "option4", "answer", "difficulty", "sectionId", "pastExamRound", "questionOrder")) {
+        for (String field : List.of("questionText", "option1", "option2", "option3", "option4", "answer", "sectionId", "pastExamRound", "questionOrder")) {
             var body = body(); body.remove(field); invalid.add(body);
         }
         for (String field : List.of("questionText", "option1", "option2", "option3", "option4", "difficulty")) {

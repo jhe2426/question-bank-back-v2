@@ -21,7 +21,7 @@ public class PutAdminQuestionRequestDto {
     private String option4;
     @NotNull @Min(1) @Max(4)
     private Integer answer;
-    @NotNull @Pattern(regexp = "상|중|하")
+    @Pattern(regexp = "상|중|하")
     private String difficulty;
     @NotNull @Min(1)
     private Integer sectionId;

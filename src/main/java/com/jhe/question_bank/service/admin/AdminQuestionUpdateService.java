@@ -86,6 +86,7 @@ public class AdminQuestionUpdateService {
             if (dto.getPastExamRound() == null || dto.getQuestionOrder() == null || !dto.getTags().isEmpty())
                 throw new BusinessException(ErrorCode.VALIDATION_FAIL);
         } else if (!"모의고사".equals(question.getQuestionType())
+                || dto.getDifficulty() == null
                 || dto.getPastExamRound() != null || dto.getQuestionOrder() != null) {
             throw new BusinessException(ErrorCode.VALIDATION_FAIL);
         }
