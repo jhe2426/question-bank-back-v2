@@ -56,7 +56,7 @@ class AdminQuestionQueryIntegrationTest {
     @EntityScan(basePackageClasses = QuestionEntity.class)
     @EnableJpaRepositories(basePackageClasses = QuestionRepository.class)
     @Import({AdminQuestionController.class, AdminQuestionQueryService.class, AdminQuestionService.class, AdminQuestionUpdateService.class,
-            AdminPastExamService.class, AdminImageCleanupService.class,
+            AdminPastExamService.class, AdminImageCleanupService.class, AdminQuestionDeleteService.class,
             PastExamController.class, PastExamServiceImplement.class, MockExamController.class,
             MockExamServiceImplement.class, CustomExceptionHandler.class,
             WebSecurityConfig.class, JwtAuthenticationFilter.class})

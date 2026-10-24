@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "관리자 문제 조회 및 수정 API",
+    "title": "관리자 문제 조회·수정·삭제 API",
     "version": "1.0.0"
   },
   "paths": {
@@ -390,6 +390,68 @@
                 "example": {
                   "code": "DBE",
                   "message": "Database error."
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteAdminQuestion",
+        "summary": "관리자 문제 삭제",
+        "description": "ADMIN 역할 필요. 학습 기록(user_solved_history, user_incorrect_questions)이나 문제 그룹(group_questions)에서 참조되면 409. 태그와 기출 연결을 삭제하고 orphan 상세 해설만 정리한다. past_exams 회차는 보존한다. 이미지 파일은 DB 커밋 후 다른 문제가 같은 URL을 참조하지 않을 때 삭제한다.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "questionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "삭제 성공",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "SU",
+                  "message": "Success."
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증되지 않음"
+          },
+          "403": {
+            "description": "ADMIN 권한 없음"
+          },
+          "404": {
+            "description": "문제를 찾을 수 없음",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "NQI",
+                  "message": "Question ID does not exist."
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "학습 기록 또는 다른 DB 참조가 있어 삭제할 수 없음",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "QIU",
+                  "message": "Question is referenced by learning records or other data."
                 }
               }
             }

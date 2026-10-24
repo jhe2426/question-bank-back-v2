@@ -71,6 +71,11 @@ public class AdminImageStorageService {
         }
 
         try {
+            if (!Files.exists(filePath, java.nio.file.LinkOption.NOFOLLOW_LINKS)) return;
+            // A symlinked parent must not redirect deletion outside the configured upload root.
+            if (!filePath.getParent().toRealPath().startsWith(root.toRealPath())) {
+                throw new IllegalArgumentException("업로드 디렉터리 외부 파일은 삭제할 수 없습니다.");
+            }
             Files.deleteIfExists(filePath);
         } catch (IOException e) {
             throw new UncheckedIOException("이미지 삭제 중 오류가 발생했습니다.", e);

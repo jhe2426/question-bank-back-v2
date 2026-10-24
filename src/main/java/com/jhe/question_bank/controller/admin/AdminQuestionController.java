@@ -7,6 +7,7 @@ import com.jhe.question_bank.service.admin.AdminQuestionQueryService;
 import jakarta.validation.Valid;
 import com.jhe.question_bank.common.dto.request.admin.PutAdminQuestionRequestDto;
 import com.jhe.question_bank.service.admin.AdminQuestionUpdateService;
+import com.jhe.question_bank.service.admin.AdminQuestionDeleteService;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import com.jhe.question_bank.common.dto.response.admin.GetAdminQuestionDetailResponseDto;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -25,6 +26,7 @@ public class AdminQuestionController {
 
     private final AdminQuestionService adminQuestionService;
     private final AdminQuestionUpdateService adminQuestionUpdateService;
+    private final AdminQuestionDeleteService adminQuestionDeleteService;
 
     private final AdminQuestionQueryService adminQuestionQueryService;
 
@@ -45,6 +47,11 @@ public class AdminQuestionController {
     @ExceptionHandler({MethodArgumentTypeMismatchException.class, MissingServletRequestPartException.class})
     public ResponseEntity<ResponseDto> invalidQuestionId(Exception exception) {
         return ResponseDto.validationFail();
+    }
+
+    @DeleteMapping("/{questionId}")
+    public ResponseEntity<ResponseDto> deleteQuestion(@PathVariable("questionId") Integer questionId) {
+        return adminQuestionDeleteService.deleteQuestion(questionId);
     }
 
     @PutMapping(value = "/{questionId}", consumes = "multipart/form-data")

@@ -13,4 +13,6 @@ public interface UserSolvedHistoryRepository extends JpaRepository<UserSolvedHis
 
     @Query("SELECT USH.questionId FROM userSolvedHistory USH WHERE USH.userId = :userId AND USH.sessionId = :sessionId AND USH.sourceType = :sourceType")
     List<Integer> findSolvedQuestionIdsBySessionId(@Param("userId") String userId, @Param("sessionId") Integer sessionId, @Param("sourceType") String sourceType);
+
+    boolean existsByQuestionId(Integer questionId);
 }

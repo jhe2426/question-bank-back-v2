@@ -2,6 +2,7 @@ package com.jhe.question_bank.common.dto.response;
 
 public interface ResponseCode {
     String SUCCESS = "SU";
+    String QUESTION_IN_USE = "QIU";
 
     String VALIDATION_FAIL = "VF";
     String EXISTS_USER_ID = "EUI";

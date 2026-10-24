@@ -56,4 +56,6 @@ public interface  GroupQuestionRepository extends JpaRepository<GroupQuestionEnt
             ORDER BY U.unit_id ASC
             """, nativeQuery = true)
     List<GetUnitGradingResultSet> findUnitGradingResultByGroupId(@Param("groupId") Integer groupId);
+
+    boolean existsByQuestionId(Integer questionId);
 }

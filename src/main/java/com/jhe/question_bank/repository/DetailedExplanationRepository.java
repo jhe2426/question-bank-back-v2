@@ -10,4 +10,8 @@ public interface DetailedExplanationRepository extends JpaRepository<DetailedExp
     
 
     boolean existsByImageUrl(String imageUrl);
+
+    @org.springframework.data.jpa.repository.Lock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
+    @org.springframework.data.jpa.repository.Query("SELECT d FROM detailedExplanations d WHERE d.detailExplanationId = :id")
+    java.util.Optional<DetailedExplanationEntity> findForUpdate(@org.springframework.data.repository.query.Param("id") Integer id);
 }

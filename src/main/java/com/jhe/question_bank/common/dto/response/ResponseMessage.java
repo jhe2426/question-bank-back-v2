@@ -2,6 +2,7 @@ package com.jhe.question_bank.common.dto.response;
 
 public interface ResponseMessage {
     String SUCCESS = "Success.";
+    String QUESTION_IN_USE = "Question is referenced by learning records or other data.";
 
     String VALIDATION_FAILED = "Validation failed.";
     String EXISTS_USER_ID = "User id already exists.";

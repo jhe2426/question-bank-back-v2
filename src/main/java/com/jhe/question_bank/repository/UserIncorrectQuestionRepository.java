@@ -16,4 +16,6 @@ public interface UserIncorrectQuestionRepository extends JpaRepository<UserIncor
 
     @Query("SELECT UIQ.questionId FROM userIncorrectQuestions UIQ WHERE UIQ.userId = :userId AND UIQ.sourceType = :sourceType")
     List<Integer> findIdsByUserIdAndSourceType(@Param("userId") String userId, @Param("sourceType") String sourceType);
+
+    boolean existsByQuestionId(Integer questionId);
 }

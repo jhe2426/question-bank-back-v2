@@ -11,6 +11,12 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum ErrorCode {
+    QUESTION_IN_USE(
+        HttpStatus.CONFLICT,
+        ResponseCode.QUESTION_IN_USE,
+        ResponseMessage.QUESTION_IN_USE
+    ),
+
     ADMIN_QUESTION_NOT_FOUND(
         HttpStatus.NOT_FOUND,
         ResponseCode.QUESTION_ID_NOT_FOUND,
