@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,6 +18,7 @@ public class DetailedExplanationEntity {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer detailExplanationId;
+    @Lob
     private String content;
     private String imageUrl;
 

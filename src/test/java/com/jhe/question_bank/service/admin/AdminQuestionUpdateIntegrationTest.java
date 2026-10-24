@@ -226,6 +226,19 @@ class AdminQuestionUpdateIntegrationTest {
     }
 
     @Test
+    void savesDetailedExplanationLongerThan255Characters() throws Exception {
+        String longExplanation = "상세 해설".repeat(100);
+        var body = body();
+        body.put("detailedExplanation", Map.of("content", longExplanation));
+        mvc.perform(request(questionId, body).with(user("admin").roles("ADMIN")))
+                .andExpect(status().isOk());
+        em.flush(); em.clear();
+        Integer savedExplanationId = questions.findById(questionId).orElseThrow().getDetailExplanationId();
+        assertThat(explanations.findById(savedExplanationId).orElseThrow().getContent())
+                .isEqualTo(longExplanation);
+    }
+
+    @Test
     void rejectsDuplicateOrderAndLeavesOriginalData() throws Exception {
         var other = questions.save(new QuestionEntity(null, null, 111, "기출문제", "다른", null, "1", "2", "3", "4", 1, null, "중", null));
         links.save(new PastExamQuestionEntity(other.getQuestionId(), links.findById(linkId).orElseThrow().getPastExamId(), 2));

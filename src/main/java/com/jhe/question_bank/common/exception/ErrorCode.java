@@ -11,6 +11,12 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum ErrorCode {
+    ADMIN_USER_NOT_FOUND(
+        HttpStatus.NOT_FOUND,
+        ResponseCode.NOT_EXIST_USER_ID,
+        ResponseMessage.NOT_EXIST_USER_ID
+    ),
+
     QUESTION_IN_USE(
         HttpStatus.CONFLICT,
         ResponseCode.QUESTION_IN_USE,

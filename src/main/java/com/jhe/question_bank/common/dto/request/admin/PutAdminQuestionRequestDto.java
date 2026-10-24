@@ -39,7 +39,6 @@ public class PutAdminQuestionRequestDto {
 
     @Getter @Setter
     public static class Explanation {
-        @Size(max = 255)
         private String content;
     }
 }
