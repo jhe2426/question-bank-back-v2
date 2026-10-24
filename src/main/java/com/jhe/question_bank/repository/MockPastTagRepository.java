@@ -13,4 +13,6 @@ import org.springframework.stereotype.Repository;
 public interface MockPastTagRepository extends JpaRepository<MockPastTagEntity, MockPastTagPk> {
     @Query("SELECT t.pastExamRound FROM mockPastTags t WHERE t.questionId = :questionId ORDER BY t.pastExamRound ASC")
     List<Integer> findPastExamRoundsByQuestionId(@Param("questionId") Integer questionId);
+
+    List<MockPastTagEntity> findAllByQuestionId(Integer questionId);
 }

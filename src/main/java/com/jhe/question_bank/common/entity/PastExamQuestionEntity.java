@@ -26,4 +26,9 @@ public class PastExamQuestionEntity {
         this.pastExamId = pastExamId;
         this.questionOrder = questionOrder;
     }
+
+    public void update(Integer pastExamId, Integer questionOrder) {
+        this.pastExamId = pastExamId;
+        this.questionOrder = questionOrder;
+    }
 }

@@ -5,6 +5,9 @@ import com.jhe.question_bank.common.dto.request.admin.GetAdminQuestionsRequestDt
 import com.jhe.question_bank.common.dto.response.admin.GetAdminQuestionListResponseDto;
 import com.jhe.question_bank.service.admin.AdminQuestionQueryService;
 import jakarta.validation.Valid;
+import com.jhe.question_bank.common.dto.request.admin.PutAdminQuestionRequestDto;
+import com.jhe.question_bank.service.admin.AdminQuestionUpdateService;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import com.jhe.question_bank.common.dto.response.admin.GetAdminQuestionDetailResponseDto;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import com.jhe.question_bank.service.admin.AdminQuestionService;
@@ -21,6 +24,7 @@ import java.util.List;
 public class AdminQuestionController {
 
     private final AdminQuestionService adminQuestionService;
+    private final AdminQuestionUpdateService adminQuestionUpdateService;
 
     private final AdminQuestionQueryService adminQuestionQueryService;
 
@@ -38,9 +42,19 @@ public class AdminQuestionController {
         return adminQuestionQueryService.getQuestion(questionId);
     }
 
-    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<ResponseDto> invalidQuestionId(MethodArgumentTypeMismatchException exception) {
+    @ExceptionHandler({MethodArgumentTypeMismatchException.class, MissingServletRequestPartException.class})
+    public ResponseEntity<ResponseDto> invalidQuestionId(Exception exception) {
         return ResponseDto.validationFail();
+    }
+
+    @PutMapping(value = "/{questionId}", consumes = "multipart/form-data")
+    public ResponseEntity<ResponseDto> updateQuestion(
+            @PathVariable("questionId") Integer questionId,
+            @Valid @RequestPart("question") PutAdminQuestionRequestDto question,
+            @RequestPart(value = "questionImage", required = false) MultipartFile questionImage,
+            @RequestPart(value = "explanationImage", required = false) MultipartFile explanationImage
+    ) {
+        return adminQuestionUpdateService.updateQuestion(questionId, question, questionImage, explanationImage);
     }
 
     @PostMapping

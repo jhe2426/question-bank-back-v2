@@ -35,7 +35,7 @@ public class AdminQuestionService {
     private final QuestionRepository questionRepository;
     private final DetailedExplanationRepository detailedExplanationRepository;
     private final PastExamQuestionRepository pastExamQuestionRepository;
-    private final PastExamRepository pastExamRepository;
+    private final AdminPastExamService adminPastExamService;
     private final MockPastTagRepository mockPastTagRepository;
     private final SectionRepository sectionRepository;
 
@@ -268,18 +268,7 @@ public class AdminQuestionService {
     // function: 기출 회차 조회 및 생성 //
     private Integer getOrCreatePastExamId(Integer round) {
 
-        return pastExamRepository.findByPastExamRound(round)
-                .map(PastExamEntity::getPastExamId)
-                .orElseGet(() -> {
-
-                    PastExamEntity entity =
-                            new PastExamEntity(round);
-
-                    PastExamEntity savedEntity =
-                            pastExamRepository.save(entity);
-
-                    return savedEntity.getPastExamId();
-                });
+        return adminPastExamService.getOrCreatePastExamId(round);
     }
 
     // function: 이미지 참조 검증 //

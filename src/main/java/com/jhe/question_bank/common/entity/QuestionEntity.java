@@ -1,6 +1,7 @@
 package com.jhe.question_bank.common.entity;
 
 import com.jhe.question_bank.common.dto.request.admin.AdminQuestionDto;
+import com.jhe.question_bank.common.dto.request.admin.PutAdminQuestionRequestDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -65,5 +66,20 @@ public class QuestionEntity {
 
         this.createdAt = LocalDateTime.now()
                 .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+    }
+
+    public void update(PutAdminQuestionRequestDto dto,
+                       String imageUrl, Integer detailExplanationId) {
+        this.questionText = dto.getQuestionText();
+        this.option1 = dto.getOption1();
+        this.option2 = dto.getOption2();
+        this.option3 = dto.getOption3();
+        this.option4 = dto.getOption4();
+        this.answer = dto.getAnswer();
+        this.difficulty = dto.getDifficulty();
+        this.sectionId = dto.getSectionId();
+        this.shortExplanation = dto.getShortExplanation();
+        this.imageUrl = imageUrl;
+        this.detailExplanationId = detailExplanationId;
     }
 }

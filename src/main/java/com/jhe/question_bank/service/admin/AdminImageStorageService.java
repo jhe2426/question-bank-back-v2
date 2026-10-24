@@ -202,4 +202,30 @@ public class AdminImageStorageService {
             throw new UncheckedIOException("이미지 검증 중 오류가 발생했습니다.", e);
         }
     }
+
+    // Only map this application's public URLs to configured local folders.
+    public java.util.Optional<String> storageKeyFromUrl(String url) {
+        if (url == null) return java.util.Optional.empty();
+        String prefix = "/api/v1/file/";
+        String path;
+        if (url.startsWith(prefix)) path = url.substring(prefix.length());
+        else if (url.startsWith(filePublicBaseUrl + prefix))
+            path = url.substring((filePublicBaseUrl + prefix).length());
+        else return java.util.Optional.empty();
+        try {
+            path = java.net.URLDecoder.decode(path.replace("+", "%2B"), java.nio.charset.StandardCharsets.UTF_8);
+        } catch (IllegalArgumentException exception) {
+            return java.util.Optional.empty();
+        }
+        String[] parts = path.split("/", -1);
+        if (parts.length != 2 || !parts[1].matches("[a-zA-Z0-9_-]+\\.(?i:png|jpg|jpeg|webp)"))
+            return java.util.Optional.empty();
+        String folder = switch (parts[0]) {
+            case "모의고사" -> mockQuestionFolderName;
+            case "기출문제" -> pastQuestionFolderName;
+            case "explanation" -> explanationFolderName;
+            default -> null;
+        };
+        return folder == null ? java.util.Optional.empty() : java.util.Optional.of(folder + "/" + parts[1]);
+    }
 }

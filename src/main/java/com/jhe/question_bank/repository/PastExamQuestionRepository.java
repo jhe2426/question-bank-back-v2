@@ -49,4 +49,7 @@ public interface  PastExamQuestionRepository extends JpaRepository<PastExamQuest
             WHERE pq.questionId = :questionId
             """)
     Optional<AdminPastExamDetails> findAdminPastExamDetails(@Param("questionId") Integer questionId);
+
+    List<PastExamQuestionEntity> findAllByQuestionId(Integer questionId);
+    boolean existsByPastExamIdAndQuestionOrderAndQuestionIdNot(Integer pastExamId, Integer questionOrder, Integer questionId);
 }

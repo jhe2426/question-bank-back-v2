@@ -17,6 +17,9 @@ public class FileServiceImplement implements FileService {
     @Value("${past-question.folder-name}")
     private String pastQuestionFolderName;
 
+    @Value("${explanation.folder-name}")
+    private String explanationFolderName;
+
     @Override
     public Resource getImageFile(String questionType, String fileName) {
 
@@ -29,10 +32,13 @@ public class FileServiceImplement implements FileService {
 
             if (questionType.equals("모의고사")) questionFolderName = mockQuestionFolderName;
             else if (questionType.equals("기출문제")) questionFolderName = pastQuestionFolderName;
+            else if (questionType.equals("explanation")) questionFolderName = explanationFolderName;
             else return null;
 
-            String uri = "file:" + filePath + questionFolderName + "/" + fileName;
-            resource = new UrlResource(uri);
+            java.nio.file.Path folder = java.nio.file.Path.of(filePath).resolve(questionFolderName).toAbsolutePath().normalize();
+            java.nio.file.Path image = folder.resolve(fileName).normalize();
+            if (!image.startsWith(folder) || image.equals(folder)) return null;
+            resource = new UrlResource(image.toUri());
 
         } catch (Exception exception) {
             exception.printStackTrace();

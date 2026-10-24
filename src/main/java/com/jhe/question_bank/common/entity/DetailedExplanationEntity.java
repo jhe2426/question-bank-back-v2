@@ -24,4 +24,9 @@ public class DetailedExplanationEntity {
         this.content = content;
         this.imageUrl = imageUrl;
     }
+
+    public void update(String content, String imageUrl) {
+        this.content = content;
+        this.imageUrl = imageUrl;
+    }
 }

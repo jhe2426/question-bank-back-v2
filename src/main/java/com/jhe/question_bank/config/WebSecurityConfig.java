@@ -72,6 +72,7 @@ public class WebSecurityConfig {
         ArrayList<String> allowedHttpMethods = new ArrayList<>();
         allowedHttpMethods.add("GET");
         allowedHttpMethods.add("POST");
+        allowedHttpMethods.add("PUT");
         allowedHttpMethods.add("PATCH");
         allowedHttpMethods.add("DELETE");
         configuration.setAllowedMethods(allowedHttpMethods);

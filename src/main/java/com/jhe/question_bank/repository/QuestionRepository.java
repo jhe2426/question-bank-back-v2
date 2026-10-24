@@ -1,6 +1,9 @@
 package com.jhe.question_bank.repository;
 
 import java.util.List;
+import java.util.Optional;
+import jakarta.persistence.LockModeType;
+import org.springframework.data.jpa.repository.Lock;
 import com.jhe.question_bank.common.dto.response.admin.AdminQuestionListItemDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -85,4 +88,12 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, Intege
             WHERE q.questionType = '모의고사' AND q.difficulty = :difficulty
             """)
     Page<AdminQuestionListItemDto> findAdminMockQuestions(@Param("difficulty") String difficulty, Pageable pageable);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT q FROM questions q WHERE q.questionId = :questionId")
+    Optional<QuestionEntity> findForUpdate(@Param("questionId") Integer questionId);
+
+    boolean existsByDetailExplanationId(Integer detailExplanationId);
+    long countByDetailExplanationId(Integer detailExplanationId);
+    boolean existsByImageUrl(String imageUrl);
 }

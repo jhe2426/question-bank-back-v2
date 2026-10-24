@@ -8,4 +8,6 @@ import com.jhe.question_bank.common.entity.DetailedExplanationEntity;
 @Repository
 public interface DetailedExplanationRepository extends JpaRepository<DetailedExplanationEntity, Integer> {
     
+
+    boolean existsByImageUrl(String imageUrl);
 }
