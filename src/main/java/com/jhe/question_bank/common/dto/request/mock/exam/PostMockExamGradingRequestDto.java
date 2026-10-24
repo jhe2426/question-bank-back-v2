@@ -1,0 +1,25 @@
+package com.jhe.question_bank.common.dto.request.mock.exam;
+
+import java.util.List;
+
+import com.jhe.question_bank.common.vo.UserAnswerVO;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+public class PostMockExamGradingRequestDto {
+    @NotBlank
+    private String detailedType;
+    @NotNull
+    private Integer sessionId;
+    @NotNull
+    private Integer timeSpentSeconds;
+    @NotNull
+    private List<UserAnswerVO> userAnswers;
+}

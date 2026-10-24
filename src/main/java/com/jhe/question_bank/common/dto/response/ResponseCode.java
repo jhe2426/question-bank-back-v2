@@ -1,0 +1,33 @@
+package com.jhe.question_bank.common.dto.response;
+
+public interface ResponseCode {
+    String SUCCESS = "SU";
+
+    String VALIDATION_FAIL = "VF";
+    String EXISTS_USER_ID = "EUI";
+    String EXISTS_USER_PHONE_NUMBER = "EUP";
+    String USED_APPROVAL_CODE = "AU";
+    String PHONE_NUMBER_AUTH_FAILED = "PAF";
+    String APPROVAL_CODE_AUTH_FAILED = "AAF";
+    String PAST_EXAM_QUESTION_ID_NOT_FOUND = "NPE";
+    String QUESTION_ID_NOT_FOUND = "NQI";
+    String INCORRECT_QUESTION_NOT_EXISTS = "NIQ";
+    String NOT_EXISTS_QUESTION_GROUP = "NEQG";
+    String PASSWORD_INCORRECT = "PI";
+    String NOT_PAST_EXAM_GROUP = "NPEG";
+    String NEW_PASSWORD_SAME_AS_CURRENT = "SP";
+
+    String AUTHENTICATION_FAIL = "AF";
+    String SIGN_IN_FAIL = "SF";
+    String AUTHORIZATION_CODE_EXPIRED = "AE";
+    String NOT_EXIST_USER_ID = "NUI";
+
+    String NO_PERMISSION = "NP";
+
+    String AUTH_CODE_ALREADY_SENT = "AR";
+
+    String SMS_SEND_FAILED = "SSF";
+    String REDIS_SERVER_ERROR = "RE";
+    String DATABASE_ERROR = "DBE";
+    String INTERNAL_SERVER_ERROR = "ISE";
+}
