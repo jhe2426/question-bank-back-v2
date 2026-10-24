@@ -53,11 +53,13 @@ public class CustomExceptionHandler {
 
     @ExceptionHandler(DataAccessException.class)
     public ResponseEntity<ResponseDto> databaseExceptionHandler(DataAccessException exception) {
+        log.info("{}", exception);
         return ResponseDto.databaseError();
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ResponseDto> exceptionHandler(Exception exception) {
+        log.info("{}", exception);
         return ResponseDto.internalServerError();
     }
 }

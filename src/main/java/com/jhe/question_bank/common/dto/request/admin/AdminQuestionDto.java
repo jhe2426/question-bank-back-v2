@@ -54,6 +54,6 @@ public class AdminQuestionDto {
     private String tags;
 
     // 기출문제인 경우에만 사용
-    private Integer pastExamId;
+    private Integer pastExamRound;
     private Integer questionOrder;
 }

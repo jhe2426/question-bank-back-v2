@@ -4,10 +4,7 @@ import com.jhe.question_bank.common.dto.request.admin.AdminQuestionDto;
 import com.jhe.question_bank.common.dto.request.admin.DetailedExplanationDto;
 import com.jhe.question_bank.common.dto.request.admin.PostQuestionsRequestDto;
 import com.jhe.question_bank.common.dto.response.ResponseDto;
-import com.jhe.question_bank.common.entity.DetailedExplanationEntity;
-import com.jhe.question_bank.common.entity.MockPastTagEntity;
-import com.jhe.question_bank.common.entity.PastExamQuestionEntity;
-import com.jhe.question_bank.common.entity.QuestionEntity;
+import com.jhe.question_bank.common.entity.*;
 import com.jhe.question_bank.common.vo.StoredImage;
 import com.jhe.question_bank.repository.*;
 import jakarta.validation.ConstraintViolation;
@@ -113,9 +110,11 @@ public class AdminQuestionService {
 
             } else if ("기출문제".equals(dto.getQuestionType())) {
 
+                Integer pastExamId = getOrCreatePastExamId(dto.getPastExamRound());
+
                 savePastExamQuestion(
                         questionId,
-                        dto.getPastExamId(),
+                        pastExamId,
                         dto.getQuestionOrder()
                 );
             }
@@ -249,17 +248,13 @@ public class AdminQuestionService {
         }
 
         // 기출문제
-        if (dto.getPastExamId() == null
+        if (dto.getPastExamRound() == null
+                || dto.getPastExamRound() <= 0
                 || dto.getQuestionOrder() == null
                 || dto.getQuestionOrder() <= 0) {
+
             throw badRequest(
                     "기출문제의 회차 및 문제 순서가 올바르지 않습니다."
-            );
-        }
-
-        if (!pastExamRepository.existsById(dto.getPastExamId())) {
-            throw badRequest(
-                    "존재하지 않는 기출 회차입니다."
             );
         }
 
@@ -268,6 +263,23 @@ public class AdminQuestionService {
                     "기출문제에는 모의고사 태그를 지정할 수 없습니다."
             );
         }
+    }
+
+    // function: 기출 회차 조회 및 생성 //
+    private Integer getOrCreatePastExamId(Integer round) {
+
+        return pastExamRepository.findByPastExamRound(round)
+                .map(PastExamEntity::getPastExamId)
+                .orElseGet(() -> {
+
+                    PastExamEntity entity =
+                            new PastExamEntity(round);
+
+                    PastExamEntity savedEntity =
+                            pastExamRepository.save(entity);
+
+                    return savedEntity.getPastExamId();
+                });
     }
 
     // function: 이미지 참조 검증 //

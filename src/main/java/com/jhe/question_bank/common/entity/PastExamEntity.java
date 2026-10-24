@@ -19,4 +19,8 @@ public class PastExamEntity {
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer pastExamId;
     private Integer pastExamRound;
+
+    public PastExamEntity(Integer pastExamRound) {
+        this.pastExamRound = pastExamRound;
+    }
 }
