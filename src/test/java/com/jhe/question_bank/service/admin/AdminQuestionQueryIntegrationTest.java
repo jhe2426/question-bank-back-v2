@@ -243,4 +243,89 @@ class AdminQuestionQueryIntegrationTest {
                         .param("questionType", "모의고사").param("difficulty", "중"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.totalElements").value(25));
     }
+
+    @Test
+    void pastExamDetailReturnsAllFieldsAndOriginalImageUrls() throws Exception {
+        DetailedExplanationEntity explanation = new DetailedExplanationEntity(
+                "상세 해설 내용", "/api/v1/file/해설/original.png");
+        em.persist(explanation);
+        QuestionEntity question = questions.save(new QuestionEntity(null, explanation.getDetailExplanationId(),
+                111, "기출문제", "상세 문제 지문", "/api/v1/file/기출문제/original.png",
+                "선택지1", "선택지2", "선택지3", "선택지4", 3, "간단 해설", "중", "2026-10-24 12:00:00"));
+        links.save(new PastExamQuestionEntity(question.getQuestionId(), round39Id, 26));
+        em.flush();
+        em.clear();
+        mvc.perform(get("/api/admin/questions/{id}", question.getQuestionId()).with(user("admin").roles("ADMIN")))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.code").value("SU"))
+                .andExpect(jsonPath("$.message").value("Success."))
+                .andExpect(jsonPath("$.questionId").value(question.getQuestionId()))
+                .andExpect(jsonPath("$.questionType").value("기출문제"))
+                .andExpect(jsonPath("$.sectionId").value(111)).andExpect(jsonPath("$.difficulty").value("중"))
+                .andExpect(jsonPath("$.questionText").value("상세 문제 지문"))
+                .andExpect(jsonPath("$.imageUrl").value("/api/v1/file/기출문제/original.png"))
+                .andExpect(jsonPath("$.option1").value("선택지1")).andExpect(jsonPath("$.option2").value("선택지2"))
+                .andExpect(jsonPath("$.option3").value("선택지3")).andExpect(jsonPath("$.option4").value("선택지4"))
+                .andExpect(jsonPath("$.answer").value(3)).andExpect(jsonPath("$.shortExplanation").value("간단 해설"))
+                .andExpect(jsonPath("$.detailedExplanation.content").value("상세 해설 내용"))
+                .andExpect(jsonPath("$.detailedExplanation.imageUrl").value("/api/v1/file/해설/original.png"))
+                .andExpect(jsonPath("$.pastExamRound").value(39)).andExpect(jsonPath("$.questionOrder").value(26))
+                .andExpect(jsonPath("$.tags", hasSize(0)));
+    }
+
+    @Test
+    void mockDetailReturnsOnlyItsOwnTagsInAscendingOrder() throws Exception {
+        em.persist(new MockPastTagEntity(latestMockId, 39));
+        em.persist(new MockPastTagEntity(latestMockId, 35));
+        em.persist(new MockPastTagEntity(latestMockId - 1, 40));
+        em.flush();
+        em.clear();
+        mvc.perform(get("/api/admin/questions/{id}", latestMockId).with(user("admin").roles("ADMIN")))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.questionType").value("모의고사"))
+                .andExpect(jsonPath("$.tags", contains(35, 39)))
+                .andExpect(jsonPath("$.pastExamRound").value(nullValue()))
+                .andExpect(jsonPath("$.questionOrder").value(nullValue()))
+                .andExpect(jsonPath("$.detailedExplanation").value(nullValue()));
+    }
+
+    @Test
+    void detailWithoutOptionalDataReturnsNullsAndEmptyTags() throws Exception {
+        QuestionEntity question = questions.save(new QuestionEntity(null, null, 111, "모의고사", "이미지 없는 문제",
+                null, "1", "2", "3", "4", 1, null, "하", "2026-10-24 12:00:00"));
+        mvc.perform(get("/api/admin/questions/{id}", question.getQuestionId()).with(user("admin").roles("ADMIN")))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.imageUrl").value(nullValue()))
+                .andExpect(jsonPath("$.shortExplanation").value(nullValue()))
+                .andExpect(jsonPath("$.detailedExplanation").value(nullValue()))
+                .andExpect(jsonPath("$.tags", hasSize(0)));
+    }
+
+    @Test
+    void imageOnlyDetailedExplanationPreservesNullContent() throws Exception {
+        DetailedExplanationEntity explanation = new DetailedExplanationEntity(null, "/original/explanation.png");
+        em.persist(explanation);
+        QuestionEntity question = questions.save(new QuestionEntity(null, explanation.getDetailExplanationId(),
+                111, "모의고사", "이미지 해설 문제", null, "1", "2", "3", "4", 1, null, "중", null));
+        mvc.perform(get("/api/admin/questions/{id}", question.getQuestionId()).with(user("admin").roles("ADMIN")))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.detailedExplanation.content").value(nullValue()))
+                .andExpect(jsonPath("$.detailedExplanation.imageUrl").value("/original/explanation.png"));
+    }
+
+    @Test
+    void nonexistentQuestionReturns404InResponseDtoFormat() throws Exception {
+        mvc.perform(get("/api/admin/questions/2147483647").with(user("admin").roles("ADMIN")))
+                .andExpect(status().isNotFound()).andExpect(jsonPath("$.code").value("NQI"))
+                .andExpect(jsonPath("$.message").value("Question ID does not exist."));
+    }
+
+    @Test
+    void nonIntegerQuestionIdReturns400() throws Exception {
+        mvc.perform(get("/api/admin/questions/not-a-number").with(user("admin").roles("ADMIN")))
+                .andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value("VF"));
+    }
+
+    @Test
+    void detailRequiresAdminRole() throws Exception {
+        mvc.perform(get("/api/admin/questions/{id}", latestMockId)).andExpect(status().isUnauthorized());
+        mvc.perform(get("/api/admin/questions/{id}", latestMockId).with(user("student").roles("USER")))
+                .andExpect(status().isForbidden());
+    }
 }

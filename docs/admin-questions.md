@@ -80,3 +80,59 @@ curl --get 'http://localhost:8080/api/admin/questions' \
 JWT 토큰 파싱과 이미지 저장은 테스트 대역을 사용합니다. 기존 JWT 필터의 역할 판정은 실제 코드로 검증합니다.
 실제 MySQL 및 실제 서명 JWT를 사용하는 배포 환경 호출은 이 테스트의 범위에 포함하지 않습니다.
 기존 `IncorrectQuestionTransactionTest`는 외부 MySQL과 사전 데이터가 필요하므로 위 명령에 포함하지 않습니다.
+
+## 단일 문제 상세 조회
+
+`GET /api/admin/questions/{questionId}` — ADMIN 권한 필요.
+
+```bash
+curl 'http://localhost:8080/api/admin/questions/501' \
+  --header "Authorization: Bearer ${ADMIN_ACCESS_TOKEN}"
+```
+
+기출문제 응답 예시(설명용 데이터):
+
+```json
+{
+  "code": "SU",
+  "message": "Success.",
+  "questionId": 501,
+  "questionType": "기출문제",
+  "sectionId": 111,
+  "difficulty": "중",
+  "questionText": "문제 지문",
+  "imageUrl": "/api/v1/file/기출문제/example.png",
+  "option1": "선택지 1",
+  "option2": "선택지 2",
+  "option3": "선택지 3",
+  "option4": "선택지 4",
+  "answer": 3,
+  "shortExplanation": "간단 해설",
+  "detailedExplanation": {
+    "content": "상세 해설 내용",
+    "imageUrl": "/api/v1/file/해설/example.png"
+  },
+  "pastExamRound": 39,
+  "questionOrder": 5,
+  "tags": []
+}
+```
+
+모의고사는 동일한 구조에서 `pastExamRound`, `questionOrder`가 `null`이며,
+`tags`에는 `[35, 39]`처럼 해당 문제의 기출 회차만 오름차순으로 반환합니다.
+목록 응답과 달리 선택지·정답·간단 해설·상세 해설까지 포함합니다.
+
+- 상세 해설이 없으면 `detailedExplanation: null`.
+- 이미지 해설만 있으면 `detailedExplanation.content: null`과 저장된 해설 이미지 URL 반환.
+- 이미지가 없으면 해당 `imageUrl: null`.
+- 태그가 없으면 `tags: []`.
+- 기출 연결 정보가 없으면 `pastExamRound`, `questionOrder`는 `null`.
+- 기출문제 한 건은 등록 서비스가 만드는 한 개의 회차 연결을 기준으로 조회합니다.
+- 존재하지 않는 문제는 404: `{"code":"NQI","message":"Question ID does not exist."}`.
+- 정수로 변환할 수 없는 문제 ID는 400: `{"code":"VF","message":"Validation failed."}`.
+
+등록 API의 `tags` 입력은 기존 쉼표 구분 문자열입니다. 이후 수정 화면의 문자열 입력에 사용할 때는
+상세 조회의 숫자 배열을 `tags.join(',')`으로 변환할 수 있습니다.
+
+상세 조회 통합 테스트는 전체 필드와 원본 URL, 실제 기출 회차 JOIN, 문제별 태그 분리·정렬,
+선택 데이터 부재, 이미지 전용 해설, 404, 잘못된 ID, 관리자 권한 제한을 검증합니다.

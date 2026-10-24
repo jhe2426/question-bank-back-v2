@@ -166,6 +166,69 @@
           }
         }
       }
+    },
+    "/api/admin/questions/{questionId}": {
+      "get": {
+        "operationId": "getAdminQuestionDetail",
+        "summary": "관리자 단일 문제 상세 조회",
+        "description": "기존 저장된 문제 및 해설 URL을 그대로 반환한다. 기출문제는 실제 회차와 순서, 모의고사는 tags 배열을 반환한다. 상세 해설이 없으면 null, 기출 연결 정보가 없으면 회차와 순서는 null이다.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "questionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminQuestionDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "문제 ID의 정수 형식이 잘못됨",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "VF",
+                  "message": "Validation failed."
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "인증되지 않음"
+          },
+          "403": {
+            "description": "ADMIN 권한 없음"
+          },
+          "404": {
+            "description": "존재하지 않는 문제 ID",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": "NQI",
+                  "message": "Question ID does not exist."
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -222,6 +285,122 @@
           "imageUrl": {
             "type": "string",
             "nullable": true
+          }
+        }
+      },
+      "AdminQuestionDetail": {
+        "type": "object",
+        "required": [
+          "questionId",
+          "sectionId",
+          "pastExamRound",
+          "questionOrder",
+          "questionType",
+          "questionText",
+          "difficulty",
+          "imageUrl",
+          "option1",
+          "option2",
+          "option3",
+          "option4",
+          "shortExplanation",
+          "code",
+          "message",
+          "answer",
+          "tags",
+          "detailedExplanation"
+        ],
+        "properties": {
+          "questionId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sectionId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "pastExamRound": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "questionOrder": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "questionType": {
+            "type": "string"
+          },
+          "questionText": {
+            "type": "string"
+          },
+          "difficulty": {
+            "type": "string",
+            "nullable": true
+          },
+          "imageUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "option1": {
+            "type": "string",
+            "nullable": false
+          },
+          "option2": {
+            "type": "string",
+            "nullable": false
+          },
+          "option3": {
+            "type": "string",
+            "nullable": false
+          },
+          "option4": {
+            "type": "string",
+            "nullable": false
+          },
+          "shortExplanation": {
+            "type": "string",
+            "nullable": true
+          },
+          "code": {
+            "type": "string",
+            "example": "SU"
+          },
+          "message": {
+            "type": "string",
+            "example": "Success."
+          },
+          "answer": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "모의고사에 연결된 실제 기출 회차. 오름차순. 없으면 빈 배열."
+          },
+          "detailedExplanation": {
+            "type": "object",
+            "nullable": true,
+            "required": [
+              "content",
+              "imageUrl"
+            ],
+            "properties": {
+              "content": {
+                "type": "string",
+                "nullable": true
+              },
+              "imageUrl": {
+                "type": "string",
+                "nullable": true
+              }
+            }
           }
         }
       }

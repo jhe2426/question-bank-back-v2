@@ -11,6 +11,12 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum ErrorCode {
+    ADMIN_QUESTION_NOT_FOUND(
+        HttpStatus.NOT_FOUND,
+        ResponseCode.QUESTION_ID_NOT_FOUND,
+        ResponseMessage.QUESTION_ID_NOT_FOUND
+    ),
+
     VALIDATION_FAIL(
         HttpStatus.BAD_REQUEST,
         ResponseCode.VALIDATION_FAIL, 

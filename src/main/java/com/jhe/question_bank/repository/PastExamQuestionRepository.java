@@ -1,6 +1,7 @@
 package com.jhe.question_bank.repository;
 
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import com.jhe.question_bank.common.dto.response.admin.AdminQuestionListItemDto;
@@ -35,4 +36,17 @@ public interface  PastExamQuestionRepository extends JpaRepository<PastExamQuest
             WHERE pe.pastExamRound = :round AND q.questionType = '기출문제'
             """)
     Page<AdminQuestionListItemDto> findAdminQuestionsByRound(@Param("round") Integer round, Pageable pageable);
+
+    interface AdminPastExamDetails {
+        Integer getPastExamRound();
+        Integer getQuestionOrder();
+    }
+
+    @Query("""
+            SELECT pe.pastExamRound AS pastExamRound, pq.questionOrder AS questionOrder
+            FROM pastExamQuestions pq
+            JOIN pastExams pe ON pe.pastExamId = pq.pastExamId
+            WHERE pq.questionId = :questionId
+            """)
+    Optional<AdminPastExamDetails> findAdminPastExamDetails(@Param("questionId") Integer questionId);
 }

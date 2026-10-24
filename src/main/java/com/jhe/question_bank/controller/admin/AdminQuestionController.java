@@ -5,6 +5,8 @@ import com.jhe.question_bank.common.dto.request.admin.GetAdminQuestionsRequestDt
 import com.jhe.question_bank.common.dto.response.admin.GetAdminQuestionListResponseDto;
 import com.jhe.question_bank.service.admin.AdminQuestionQueryService;
 import jakarta.validation.Valid;
+import com.jhe.question_bank.common.dto.response.admin.GetAdminQuestionDetailResponseDto;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import com.jhe.question_bank.service.admin.AdminQuestionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +29,18 @@ public class AdminQuestionController {
             @Valid @ModelAttribute GetAdminQuestionsRequestDto request
     ) {
         return adminQuestionQueryService.getQuestions(request);
+    }
+
+    @GetMapping("/{questionId}")
+    public ResponseEntity<GetAdminQuestionDetailResponseDto> getQuestion(
+            @PathVariable("questionId") Integer questionId
+    ) {
+        return adminQuestionQueryService.getQuestion(questionId);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ResponseDto> invalidQuestionId(MethodArgumentTypeMismatchException exception) {
+        return ResponseDto.validationFail();
     }
 
     @PostMapping

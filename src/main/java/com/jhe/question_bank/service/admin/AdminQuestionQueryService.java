@@ -6,6 +6,12 @@ import com.jhe.question_bank.common.exception.BusinessException;
 import com.jhe.question_bank.common.exception.ErrorCode;
 import com.jhe.question_bank.repository.PastExamQuestionRepository;
 import com.jhe.question_bank.repository.QuestionRepository;
+import com.jhe.question_bank.repository.DetailedExplanationRepository;
+import com.jhe.question_bank.repository.MockPastTagRepository;
+import com.jhe.question_bank.common.dto.response.admin.GetAdminQuestionDetailResponseDto;
+import com.jhe.question_bank.common.entity.QuestionEntity;
+import com.jhe.question_bank.common.entity.DetailedExplanationEntity;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +25,29 @@ import org.springframework.transaction.annotation.Transactional;
 public class AdminQuestionQueryService {
     private final QuestionRepository questionRepository;
     private final PastExamQuestionRepository pastExamQuestionRepository;
+
+    private final DetailedExplanationRepository detailedExplanationRepository;
+    private final MockPastTagRepository mockPastTagRepository;
+
+    public ResponseEntity<GetAdminQuestionDetailResponseDto> getQuestion(Integer questionId) {
+        QuestionEntity question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.ADMIN_QUESTION_NOT_FOUND));
+        DetailedExplanationEntity explanation = question.getDetailExplanationId() == null ? null
+                : detailedExplanationRepository.findById(question.getDetailExplanationId()).orElse(null);
+        Integer pastExamRound = null;
+        Integer questionOrder = null;
+        List<Integer> tags = List.of();
+        if ("기출문제".equals(question.getQuestionType())) {
+            var pastExam = pastExamQuestionRepository.findAdminPastExamDetails(questionId).orElse(null);
+            if (pastExam != null) {
+                pastExamRound = pastExam.getPastExamRound();
+                questionOrder = pastExam.getQuestionOrder();
+            }
+        } else if ("모의고사".equals(question.getQuestionType())) {
+            tags = mockPastTagRepository.findPastExamRoundsByQuestionId(questionId);
+        }
+        return GetAdminQuestionDetailResponseDto.success(question, explanation, pastExamRound, questionOrder, tags);
+    }
 
     public ResponseEntity<GetAdminQuestionListResponseDto> getQuestions(GetAdminQuestionsRequestDto request) {
         if (request.getPage() < 0 || request.getSize() < 1 || request.getSize() > 100) {
