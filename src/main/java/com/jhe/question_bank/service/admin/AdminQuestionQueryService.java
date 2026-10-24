@@ -29,20 +29,21 @@ public class AdminQuestionQueryService {
     private final DetailedExplanationRepository detailedExplanationRepository;
     private final MockPastTagRepository mockPastTagRepository;
 
-    public ResponseEntity<GetAdminQuestionDetailResponseDto> getQuestion(Integer questionId) {
+    public ResponseEntity<GetAdminQuestionDetailResponseDto> getQuestion(Integer questionId, Integer pastExamRound) {
         QuestionEntity question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.ADMIN_QUESTION_NOT_FOUND));
         DetailedExplanationEntity explanation = question.getDetailExplanationId() == null ? null
                 : detailedExplanationRepository.findById(question.getDetailExplanationId()).orElse(null);
-        Integer pastExamRound = null;
         Integer questionOrder = null;
         List<Integer> tags = List.of();
         if ("기출문제".equals(question.getQuestionType())) {
-            var pastExam = pastExamQuestionRepository.findAdminPastExamDetails(questionId).orElse(null);
-            if (pastExam != null) {
-                pastExamRound = pastExam.getPastExamRound();
-                questionOrder = pastExam.getQuestionOrder();
-            }
+            var pastExam = pastExamQuestionRepository
+                    .findAdminPastExamDetails(questionId, pastExamRound)
+                    .orElseThrow(() ->
+                            new BusinessException(ErrorCode.ADMIN_QUESTION_NOT_FOUND)
+                    );
+
+            questionOrder = pastExam.getQuestionOrder();
         } else if ("모의고사".equals(question.getQuestionType())) {
             tags = mockPastTagRepository.findPastExamRoundsByQuestionId(questionId);
         }

@@ -39,9 +39,10 @@ public class AdminQuestionController {
 
     @GetMapping("/{questionId}")
     public ResponseEntity<GetAdminQuestionDetailResponseDto> getQuestion(
-            @PathVariable("questionId") Integer questionId
+            @PathVariable("questionId") Integer questionId,
+            @RequestParam(required = false) Integer pastExamRound
     ) {
-        return adminQuestionQueryService.getQuestion(questionId);
+        return adminQuestionQueryService.getQuestion(questionId, pastExamRound);
     }
 
     @ExceptionHandler({MethodArgumentTypeMismatchException.class, MissingServletRequestPartException.class})
