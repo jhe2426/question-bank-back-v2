@@ -65,7 +65,8 @@ curl 'http://localhost:4000/api/admin/users/haeun01/learning-summary' \
       "sectionId": 111,
       "sectionName": "데이터의 이해",
       "solvedCount": 35,
-      "totalSolveSeconds": null
+      "correctCount": 28,
+      "accuracyRate": 80.0
     }
   ]
 }
@@ -94,11 +95,14 @@ curl 'http://localhost:4000/api/admin/users/haeun01/learning-summary' \
 
 ## 집계 기준과 시간 데이터
 
-- `totalSolvedCount`와 섹션의 `solvedCount`는 `user_solved_history`의 `COUNT(DISTINCT question_id)`입니다. 같은 문제를 여러 번 푼 기록은 한 문항으로 셉니다.
+- `user_solved_history`는 풀이할 때마다 자동 증가 `solved_id`를 가진 새 행을 저장합니다.
+- 기존 `totalSolvedCount`는 중복 문제를 제외한 `COUNT(DISTINCT question_id)`를 유지합니다.
+- 섹션의 `solvedCount`는 이력 행을 `COUNT`한 누적 풀이 횟수입니다. 같은 문제를 3번 풀면 3회로 셉니다.
 - 섹션은 문제의 현재 `questions.section_id`와 `sections.section_name`을 기준으로 DB에서 `GROUP BY`합니다.
-- 전체 시간은 실제로 저장된 `user_problem_groups.time_spent_seconds`의 합계입니다. 학습 그룹 기록이 없으면 `null`입니다.
-- 현재 DB의 `time_spent_seconds`는 `NOT NULL`이며, 확인 시점의 5개 그룹 기록에 모두 초 값이 저장되어 있었습니다.
-- 문제별 풀이 기록인 `user_solved_history`에는 풀이 시간과 `group_id`가 없습니다. 전체 시험 시간을 섹션에 배분할 근거가 없으므로 모든 섹션의 `totalSolveSeconds`는 `null`입니다.
+- `correctCount`는 해당 섹션 이력 중 `is_correct = true`인 행 수입니다.
+- `accuracyRate`는 `correctCount / solvedCount * 100`으로 계산한 퍼센트 숫자입니다.
+- 전체 시간은 JOIN 없이 `user_problem_groups`만 조회하여 실제 `time_spent_seconds`를 합산합니다. 기록된 시간이 없으면 `null`입니다.
+- 문제별 풀이 기록인 `user_solved_history`에는 풀이 시간과 `group_id`가 없으므로 섹션별 시간은 응답하지 않습니다.
 
 섹션별 시간을 제공하려면 최소한 문제 풀이 단위에 `solve_seconds`와 해당 응시 그룹을 식별할 `group_id`를 저장해야 합니다. 채점 요청도 문제별 시간 값을 받아 검증하고 `user_solved_history`에 함께 기록해야 합니다. 이후 `question_id`로 섹션을 JOIN하여 `SUM(solve_seconds)`를 계산할 수 있습니다. 이 변경에는 DB 마이그레이션과 기존 기록의 `null` 유지 정책이 필요하며 이번 조회 API에는 포함하지 않았습니다.
 

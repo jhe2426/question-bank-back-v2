@@ -4,4 +4,5 @@ public interface AdminSectionLearningSummaryResultSet {
     Integer getSectionId();
     String getSectionName();
     long getSolvedCount();
+    long getCorrectCount();
 }

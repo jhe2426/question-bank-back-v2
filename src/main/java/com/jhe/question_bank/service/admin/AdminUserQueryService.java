@@ -48,7 +48,8 @@ public class AdminUserQueryService {
                         summary.getSectionId(),
                         summary.getSectionName(),
                         summary.getSolvedCount(),
-                        null
+                        summary.getCorrectCount(),
+                        calculateAccuracyRate(summary.getCorrectCount(), summary.getSolvedCount())
                 ))
                 .toList();
 
@@ -69,5 +70,10 @@ public class AdminUserQueryService {
         if (keyword == null) return null;
         String digits = keyword.replaceAll("[^0-9]", "");
         return digits.isBlank() ? null : digits;
+    }
+
+    private double calculateAccuracyRate(long correctCount, long solvedCount) {
+        if (solvedCount == 0) return 0.0;
+        return (double) correctCount / solvedCount * 100;
     }
 }

@@ -21,18 +21,21 @@ public class GetAdminUserLearningSummaryResponseDto extends ResponseDto {
         private final Integer sectionId;
         private final String sectionName;
         private final long solvedCount;
-        private final Long totalSolveSeconds;
+        private final long correctCount;
+        private final double accuracyRate;
 
         public SectionSummaryDto(
                 Integer sectionId,
                 String sectionName,
                 long solvedCount,
-                Long totalSolveSeconds
+                long correctCount,
+                double accuracyRate
         ) {
             this.sectionId = sectionId;
             this.sectionName = sectionName;
             this.solvedCount = solvedCount;
-            this.totalSolveSeconds = totalSolveSeconds;
+            this.correctCount = correctCount;
+            this.accuracyRate = accuracyRate;
         }
     }
 

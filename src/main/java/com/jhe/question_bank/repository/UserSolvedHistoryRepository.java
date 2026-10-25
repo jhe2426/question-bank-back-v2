@@ -27,7 +27,8 @@ public interface UserSolvedHistoryRepository extends JpaRepository<UserSolvedHis
     @Query("""
             SELECT q.sectionId AS sectionId,
                    s.sectionName AS sectionName,
-                   COUNT(DISTINCT ush.questionId) AS solvedCount
+                   COUNT(ush.solvedId) AS solvedCount,
+                   SUM(CASE WHEN ush.isCorrect = true THEN 1 ELSE 0 END) AS correctCount
             FROM userSolvedHistory ush
             JOIN questions q ON q.questionId = ush.questionId
             JOIN sections s ON s.sectionId = q.sectionId

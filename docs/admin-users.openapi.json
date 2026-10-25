@@ -27,13 +27,20 @@
       "get": {
         "summary": "회원별 학습 현황 조회",
         "operationId": "getAdminUserLearningSummary",
-        "description": "풀이 문항 수는 중복 문제를 제외한다. 전체 시간은 응시 그룹의 실제 시간 합계이며 섹션별 시간은 측정 데이터가 없어 null이다.",
+        "description": "섹션별 풀이 횟수는 user_solved_history의 이력 행을 기준으로 하므로 동일 문제의 재풀이도 각각 집계한다. 기존 totalSolvedCount는 중복 문제를 제외한다. 전체 시간은 JOIN 없이 응시 그룹의 실제 시간만 합산하며, 섹션별 시간은 제공하지 않는다.",
         "security": [{"bearerAuth": []}],
         "parameters": [
           {"name": "userId", "in": "path", "required": true, "schema": {"type": "string"}}
         ],
         "responses": {
-          "200": {"description": "회원 기본 정보와 전체·섹션별 학습 현황"},
+          "200": {
+            "description": "회원 기본 정보와 전체·섹션별 학습 현황",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/AdminUserLearningSummary"}
+              }
+            }
+          },
           "401": {"description": "인증되지 않음"},
           "403": {"description": "ADMIN 권한 없음"},
           "404": {
@@ -47,6 +54,36 @@
   "components": {
     "securitySchemes": {
       "bearerAuth": {"type": "http", "scheme": "bearer", "bearerFormat": "JWT"}
+    },
+    "schemas": {
+      "AdminUserLearningSummary": {
+        "type": "object",
+        "required": ["code", "message", "userId", "userName", "phoneNumber", "totalSolvedCount", "totalSolveSeconds", "sectionSummaries"],
+        "properties": {
+          "code": {"type": "string", "example": "SU"},
+          "message": {"type": "string", "example": "Success."},
+          "userId": {"type": "string"},
+          "userName": {"type": "string"},
+          "phoneNumber": {"type": "string"},
+          "totalSolvedCount": {"type": "integer", "format": "int64", "minimum": 0},
+          "totalSolveSeconds": {"type": "integer", "format": "int64", "minimum": 0, "nullable": true},
+          "sectionSummaries": {
+            "type": "array",
+            "items": {"$ref": "#/components/schemas/AdminSectionLearningSummary"}
+          }
+        }
+      },
+      "AdminSectionLearningSummary": {
+        "type": "object",
+        "required": ["sectionId", "sectionName", "solvedCount", "correctCount", "accuracyRate"],
+        "properties": {
+          "sectionId": {"type": "integer"},
+          "sectionName": {"type": "string"},
+          "solvedCount": {"type": "integer", "format": "int64", "minimum": 0},
+          "correctCount": {"type": "integer", "format": "int64", "minimum": 0},
+          "accuracyRate": {"type": "number", "format": "double", "minimum": 0, "maximum": 100}
+        }
+      }
     }
   }
 }
